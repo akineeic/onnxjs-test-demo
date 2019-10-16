@@ -25,8 +25,23 @@ export async function warmupModel(model: InferenceSession, dims: number[]) {
 }
 
 export async function runModel(model: InferenceSession, preprocessedData: Tensor): Promise<[Tensor, number]> {
-    const start = new Date();
     try {
+        const sumTime: number[] = [];
+        const iterations = 10;
+        for (let i = 0; i < iterations+1; i++){
+            const start = new Date();
+            await model.run([preprocessedData]);
+            const end = new Date();
+            const inferenceTime = (end.getTime() - start.getTime());
+            sumTime.push(inferenceTime);
+            console.log(`Iteration: ${i+1} / ${iterations+1}, InferenceTime: ${inferenceTime}`);
+        }
+
+        const mean = calMean(sumTime);
+        const std = calStd(sumTime);
+        console.log(`InferenceTime: ${mean.toFixed(1)} ± ${std.toFixed(2)} [ms]`);
+
+        const start = new Date();
         const outputData = await model.run([preprocessedData]);
         const end = new Date();
         const inferenceTime = (end.getTime() - start.getTime());
@@ -38,4 +53,36 @@ export async function runModel(model: InferenceSession, preprocessedData: Tensor
         throw new Error();
     }
     
+}
+
+    function calMean(results: number[]): number{
+            // remove first run, which is regarded as "warming up" execution
+            results.shift();
+            const d = results.reduce((d, v) => {
+                d.sum += v;
+                d.sum2 += v * v;
+                return d;
+            }, {
+                sum: 0,
+                sum2: 0
+            });
+            const mean = d.sum / results.length;
+            //let std = Math.sqrt((d.sum2 - results.length * mean * mean) / (results.length - 1));
+            return mean;
+    }
+
+    function calStd(results: number[]): number{
+        // remove first run, which is regarded as "warming up" execution
+        results.shift();
+        const d = results.reduce((d, v) => {
+            d.sum += v;
+            d.sum2 += v * v;
+            return d;
+        }, {
+            sum: 0,
+            sum2: 0
+        });
+        const mean = d.sum / results.length;
+        const std = Math.sqrt((d.sum2 - results.length * mean * mean) / (results.length - 1));
+        return std;
 }
