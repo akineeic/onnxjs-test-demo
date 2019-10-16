@@ -27,7 +27,7 @@ export async function warmupModel(model: InferenceSession, dims: number[]) {
 export async function runModel(model: InferenceSession, preprocessedData: Tensor): Promise<[Tensor, number]> {
     try {
         const sumTime: number[] = [];
-        const iterations = 10;
+        const iterations = 200;
         for (let i = 0; i < iterations+1; i++){
             const start = new Date();
             await model.run([preprocessedData]);
