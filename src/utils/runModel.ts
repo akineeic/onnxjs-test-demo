@@ -29,17 +29,17 @@ export async function runModel(model: InferenceSession, preprocessedData: Tensor
         const sumTime: number[] = [];
         const iterations = 200;
         for (let i = 0; i < iterations+1; i++){
-            const start = new Date();
+            const start = performance.now();
             await model.run([preprocessedData]);
-            const end = new Date();
-            const inferenceTime = (end.getTime() - start.getTime());
+            const end = performance.now();
+            const inferenceTime = end - start;
             sumTime.push(inferenceTime);
-            console.log(`Iteration: ${i+1} / ${iterations+1}, InferenceTime: ${inferenceTime}`);
+            console.log(`Iteration: ${i+1} / ${iterations+1}, InferenceTime: ${inferenceTime.toFixed(2)}`);
         }
 
         const mean = calMean(sumTime);
         const std = calStd(sumTime);
-        console.log(`InferenceTime: ${mean.toFixed(1)} ± ${std.toFixed(2)} [ms]`);
+        console.log(`InferenceTime: ${mean.toFixed(2)} ± ${std.toFixed(2)} [ms]`);
 
         const start = new Date();
         const outputData = await model.run([preprocessedData]);
