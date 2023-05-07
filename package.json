@@ -32,7 +32,7 @@
     "@types/webgl2": "0.0.4",
     "@vue/cli-plugin-babel": "^3.6.0",
     "@vue/cli-plugin-typescript": "^3.6.0",
-    "@vue/cli-service": "^3.6.0",
+    "@vue/cli-service": "^5.0.8",
     "babel-plugin-add-module-exports": "1.0.2",
     "blueimp-load-image": "^2.21.0",
     "chroma-js": "^2.0.3",
